@@ -12,21 +12,20 @@
     propTypes: {
       tag: React.PropTypes.string.isRequired,
       scale: React.PropTypes.number.isRequired,
-      pan: React.PropTypes.bool
+      x: React.PropTypes.number.isRequired,
+      y: React.PropTypes.number.isRequired,
+      panning: React.PropTypes.bool.isRequired,
+      onPan: React.PropTypes.function
     },
 
     getDefaultProps: function() {
       return {
         tag: 'div',
         scale: 1,
-        pan: false
-      };
-    },
-
-    getInitialState: function() {
-      return {
         x: 0,
-        y: 0
+        y: 0,
+        panning: false,
+        onPan: null
       };
     },
 
@@ -34,10 +33,12 @@
       var shrinkage;
       if (nextProps.scale < this.props.scale) {
         shrinkage = nextProps.scale / this.props.scale;
-        this.setState({
-          x: this.state.x * shrinkage,
-          y: this.state.y * shrinkage
-        });
+        if (typeof this.props.onPan === 'function') {
+          this.props.onPan({
+            x: this.props.x * shrinkage,
+            y: this.props.y * shrinkage
+          });
+        }
       }
     },
 
@@ -48,10 +49,12 @@
 
     activeEventHandlers: {
       mousemove: function(event) {
-        this.setState({
-          x: event.pageX - this._start.x,
-          y: event.pageY - this._start.y
-        });
+        if (typeof this.props.onPan === 'function') {
+          this.props.onPan({
+            x: event.pageX - this._start.x,
+            y: event.pageY - this._start.y
+          });
+        }
       },
 
       mouseup: function() {
@@ -68,11 +71,11 @@
     },
 
     handleMouseDown: function(event) {
-      if (this.props.pan) {
+      if (this.props.panning) {
         event.preventDefault();
         event.stopPropagation();
-        this._start.x = event.pageX - this.state.x;
-        this._start.y = event.pageY - this.state.y;
+        this._start.x = event.pageX - this.props.x;
+        this._start.y = event.pageY - this.props.y;
         addEventListener('mousemove', this);
         addEventListener('mouseup', this);
       }
@@ -80,7 +83,7 @@
 
     render: function() {
       var transformation = [
-        'translate(' + this.state.x + 'px, ' + this.state.y + 'px)',
+        'translate(' + this.props.x + 'px, ' + this.props.y + 'px)',
         'scale(' + this.props.scale + ')'
       ].join(' ');
 
@@ -95,7 +98,7 @@
           'react-zoomable',
           this.props.className
         ].filter(Boolean).join(' '),
-        'data-panning': this.props.pan || null,
+        'data-panning': this.props.panning || null,
         style: Object.assign({
           overflow: 'hidden'
         }, this.props.style),
