@@ -7,9 +7,18 @@
   </head>
 
   <body>
-    <script src="./node_modules/react/dist/react.js"></script>
-    <script src="./node_modules/react-dom/dist/react-dom.js"></script>
-    <script src="./node_modules/babel-core/browser.js"></script>
+    <script>
+      document.write((navigator.onLine ? [
+        '<script src="https://unpkg.com/react@15.0.1/dist/react.js"></'+'script>',
+        '<script src="https://unpkg.com/react-dom@15.0.1/dist/react-dom.js"></'+'script>',
+        '<script src="https://unpkg.com/babel-core@5.8.38/browser.js"></'+'script>'
+      ] : [
+        '<script src="./node_modules/react/dist/react.js"></'+'script>',
+        '<script src="./node_modules/react-dom/dist/react-dom.js"></'+'script>',
+        '<script src="./node_modules/babel-core/browser.js"></'+'script>'
+      ]).join('\n'));
+    </script>
+
     <script src="./index.js"></script>
 
     <script type="text/babel">
